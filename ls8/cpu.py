@@ -7,24 +7,25 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.ram = [0] * 32 # Each element will containt 8 bits so 8 * 32 = 256 total bits
+        self.reg = [0] * 8
 
-    def load(self):
+    def load(self, program = None):
         """Load a program into memory."""
 
         address = 0
 
         # For now, we've just hardcoded a program:
-
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        if program == None:
+            program = [
+                # From print8.ls8
+                0b10000010, # LDI R0,8
+                0b00000000,
+                0b00001000,
+                0b01000111, # PRN R0
+                0b00000000,
+                0b00000001, # HLT
+            ]
 
         for instruction in program:
             self.ram[address] = instruction
@@ -60,6 +61,18 @@ class CPU:
 
         print()
 
+    def ram_read(address)
+        return self.ram[address]
+
+    def ram_write(address, value)
+        self.ram[address] = value
+
     def run(self):
         """Run the CPU."""
+
+        PC = 0
+        running = True
+        IR = 0
+        while running == True:
+            
         pass

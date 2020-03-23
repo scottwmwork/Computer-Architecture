@@ -60,6 +60,13 @@ but you'll have to implement those three above instructions first!
 ## Step 0: IMPORTANT: inventory what is here!
 
 * Make a list of files here.
+
+  - cpu.py - A class that emulates the hardware of a cpu
+      
+      - The program, alu, load, trace, have been implemented but not the run or the constructor for the CPU to create ram or reg.
+
+  - ls8.py - Creates an instance of the cpu and runs it
+
 * Write a short 3-10-word description of what each file does.
 * Note what has been implemented, and what hasn't.
 * Read this whole file.
