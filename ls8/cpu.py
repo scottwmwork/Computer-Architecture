@@ -61,18 +61,37 @@ class CPU:
 
         print()
 
-    def ram_read(address)
+    def ram_read(address):
         return self.ram[address]
 
-    def ram_write(address, value)
+    def ram_write(address, value):
         self.ram[address] = value
 
     def run(self):
         """Run the CPU."""
 
         PC = 0
-        running = True
         IR = 0
+
+        running = True
         while running == True:
             
-        pass
+            #LDI
+            if self.ram[PC] == 0b10000010:
+                registor_address = self.ram[PC + 1]
+                value = self.ram[PC + 2]
+                self.reg[registor_address] = value
+                PC += 3
+            
+            # PRN
+            if self.ram[PC] == 0b01000111:
+                registor_address = self.ram[PC + 1]
+                print(self.reg[registor_address])
+                PC += 2
+            # HLT
+            if self.ram[PC] == 0b00000001:
+                quit()
+
+            # Condition to stop running once done with program
+            # if self.ram[PC] == 0b00000000:
+            #     quit()
