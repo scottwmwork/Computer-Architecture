@@ -10,26 +10,71 @@ class CPU:
         self.ram = [0] * 32 # Each element will containt 8 bits so 8 * 32 = 256 total bits
         self.reg = [0] * 8
 
+
+        ADD = 0b10100000
+        MULT = 0b10100010
+        PRINT = 0b01000111
+        PUSH = 0b01000101
+        POP = 0b01000110
+        LDI = 0b10000010
+        HLT = 0b00000001
+    
+
+        self.branchtable = {}
+        self.branchtable[ADD] = self.add
+        self.branchtable[MULT] = self.mult
+        self.branchtable[PRINT] = self.prn
+        self.branchtable[LDI] = self.ldi
+        self.branchtable[HLT] = self.hlt
+        self.branchtable[POP] = self.pop
+        self.branchtable[PUSH] = self.push
+        self.branchtable[LDI] = self.ldi
+
+        self.PC = 0
+        self.IR = 0
+
     def load(self, program = None):
         """Load a program into memory."""
 
         address = 0
 
         # For now, we've just hardcoded a program:
-        if program == None:
-            program = [
-                # From print8.ls8
-                0b10000010, # LDI R0,8
-                0b00000000,
-                0b00001000,
-                0b01000111, # PRN R0
-                0b00000000,
-                0b00000001, # HLT
-            ]
+        program = [
+            # From print8.ls8
+            0b10000010, # LDI R0,8
+            0b00000000,
+            0b00001000,
+            0b01000111, # PRN R0
+            0b00000000,
+            0b00000001, # HLT
+        ]
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        if len(sys.argv) > 1:
+            print("here")
+            file_name = sys.argv[1]
+            program = open(file_name)
+            program = program.read().split("\n")
+            new_program = []
+            for string in program:
+
+                # Ignore comments
+                if "#" in string:
+                    string = string.split("#")[0]
+                
+                # Ignore empty lines
+                if string != '':
+                    new_program.append(string)
+
+            program = new_program
+
+            for instruction in program:
+                self.ram[address] = int(instruction, 2)
+                address += 1
+        else:
+            
+            for instruction in program:
+                self.ram[address] = instruction
+                address += 1
 
 
     def alu(self, op, reg_a, reg_b):
@@ -37,9 +82,18 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        elif op == "SUB":
+            self.reg[reg_a] -= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
+
+    def mult(self,reg_a, reg_b):
+        self.reg[reg_a] *= self.reg[reg_b]
+    def add(self, reg_a, reg_b):
+        self.alu("ADD", reg_a, reg_b)
+    def subtract(self, reg_a, reg_b):
+        self.alu("SUB", reg_a, reg_b)
+    def prn()
 
     def trace(self):
         """
@@ -59,39 +113,52 @@ class CPU:
         for i in range(8):
             print(" %02X" % self.reg[i], end='')
 
-        print()
-
     def ram_read(address):
         return self.ram[address]
 
     def ram_write(address, value):
         self.ram[address] = value
 
+
+    def hlt(self, reg_a, reg_b):
+        quit()
+
+    def push(self, reg_a, reg_b):
+        #TODO
+        pass
+    
+    def pop(self, reg_a, reg_b):
+        #TODO
+        pass
+
+    def ldi(self, reg_a, reg_b):
+        #TODO
+        pass
+        
+
     def run(self):
-        """Run the CPU."""
-
-        PC = 0
-        IR = 0
-
-        running = True
-        while running == True:
+        while PC <= len(self.ram):
             
-            #LDI
-            if self.ram[PC] == 0b10000010:
-                registor_address = self.ram[PC + 1]
-                value = self.ram[PC + 2]
-                self.reg[registor_address] = value
-                PC += 3
-            
-            # PRN
-            if self.ram[PC] == 0b01000111:
-                registor_address = self.ram[PC + 1]
-                print(self.reg[registor_address])
-                PC += 2
-            # HLT
-            if self.ram[PC] == 0b00000001:
-                quit()
+            IR = self.ram[PC]
+            self.branchtable[IR](self.ram[PC + 1], self.ram[PC + 2])
 
-            # Condition to stop running once done with program
-            # if self.ram[PC] == 0b00000000:
-            #     quit()
+
+        # running = True
+        # while running == True:
+        #     IR = self.ram[PC]
+        #     #LDI
+        #     if IR == 0b10000010:
+        #         registor_address = self.ram[PC + 1]
+        #         value = self.ram[PC + 2]
+        #         self.reg[registor_address] = value
+        #         PC += 3
+            
+        #     # PRN
+        #     if IR == 0b01000111:
+        #         registor_address = self.ram[PC + 1]
+        #         print(self.reg[registor_address])
+        #         PC += 2
+        #     # HLT
+        #     if IR == 0b00000001:
+        #         quit()
+
