@@ -131,9 +131,8 @@ class CPU:
         #TODO
         pass
 
-    def ldi(self, reg_a, reg_b):
-        #TODO
-        pass
+    def ldi(self, reg_a, i):
+        self.reg[reg_a] = i
         
 
     def run(self):
