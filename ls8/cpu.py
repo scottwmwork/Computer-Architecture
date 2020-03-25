@@ -7,9 +7,8 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        self.ram = [0] * 32 # Each element will containt 8 bits so 8 * 32 = 256 total bits
+        self.ram = [0] * 256 # Each element will containt 8 bits so 8 * 32 = 256 total bits
         self.reg = [0] * 8
-
 
         ADD = 0b10100000
         MULT = 0b10100010
@@ -50,7 +49,6 @@ class CPU:
         ]
 
         if len(sys.argv) > 1:
-            print("here")
             file_name = sys.argv[1]
             program = open(file_name)
             program = program.read().split("\n")
@@ -88,12 +86,23 @@ class CPU:
             raise Exception("Unsupported ALU operation")
 
     def mult(self,reg_a, reg_b):
+        """
+        places the product of reg_a and reg_b into reg_a
+        """
         self.reg[reg_a] *= self.reg[reg_b]
+        self.PC += 3
+
     def add(self, reg_a, reg_b):
         self.alu("ADD", reg_a, reg_b)
+        self.PC += 3
+
     def subtract(self, reg_a, reg_b):
         self.alu("SUB", reg_a, reg_b)
-    def prn()
+        self.PC += 3
+
+    def prn(self, reg_a, reg_b):
+        print(self.reg[reg_a])
+        self.PC += 2
 
     def trace(self):
         """
@@ -119,7 +128,6 @@ class CPU:
     def ram_write(address, value):
         self.ram[address] = value
 
-
     def hlt(self, reg_a, reg_b):
         quit()
 
@@ -133,30 +141,29 @@ class CPU:
 
     def ldi(self, reg_a, i):
         self.reg[reg_a] = i
-        
+        self.PC += 3
 
     def run(self):
-        while PC <= len(self.ram):
-            
-            IR = self.ram[PC]
-            self.branchtable[IR](self.ram[PC + 1], self.ram[PC + 2])
 
+        while self.PC <= len(self.ram):
+            IR = self.ram[self.PC]
+            self.branchtable[IR](self.ram[self.PC + 1], self.ram[self.PC + 2])
 
         # running = True
         # while running == True:
-        #     IR = self.ram[PC]
+        #     IR = self.ram[self.PC]
         #     #LDI
         #     if IR == 0b10000010:
-        #         registor_address = self.ram[PC + 1]
-        #         value = self.ram[PC + 2]
+        #         registor_address = self.ram[self.PC + 1]
+        #         value = self.ram[self.PC + 2]
         #         self.reg[registor_address] = value
-        #         PC += 3
+        #         self.PC += 3
             
         #     # PRN
         #     if IR == 0b01000111:
-        #         registor_address = self.ram[PC + 1]
+        #         registor_address = self.ram[self.PC + 1]
         #         print(self.reg[registor_address])
-        #         PC += 2
+        #         self.PC += 2
         #     # HLT
         #     if IR == 0b00000001:
         #         quit()
