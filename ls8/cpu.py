@@ -7,7 +7,7 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        self.ram = [0] * 32 # Each element will containt 8 bits so 8 * 32 = 256 total bits
+        self.ram = [0] * 40 # Each element will containt 8 bits so 8 * 32 = 256 total bits
         self.reg = [0] * 8
         
         ADD = 0b10100000
@@ -32,7 +32,7 @@ class CPU:
         self.PC = 0
         self.IR = 0
         # Stack Pointer
-        self.SP = 20
+        self.SP = len(self.ram) - 1
 
     def load(self, program = None):
         """Load a program into memory."""
@@ -138,20 +138,20 @@ class CPU:
         # Copy the value in the given register to the address pointed 
         self.ram[self.SP] = val
         # Decrement the Stack Pointer
-        self.SP += 1
+        self.SP -= 1
         # Increase Program counter
         self.PC += 2
     
     def pop(self, reg_a, reg_b):
         #TODO
-        val = self.ram[self.SP - 1]
+        val = self.ram[self.SP + 1]
         # copy the value from the address pointed to by SP to the given register
         self.reg[reg_a] = val
         
         # Remove value from memory
-        self.ram[self.SP - 1] = 0
+        self.ram[self.SP + 1] = 0
         # Increment Stack Pointer
-        self.SP -= 1
+        self.SP += 1
         # Increment Program Counter
         self.PC += 2
 
@@ -163,6 +163,6 @@ class CPU:
 
         while self.PC <= len(self.ram):
             IR = self.ram[self.PC]
-            print("IR:", bin(IR))
+            print("IR:",bin(IR))
             self.branchtable[IR](self.ram[self.PC + 1], self.ram[self.PC + 2])
 
