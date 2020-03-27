@@ -23,6 +23,10 @@ class CPU:
         POP   = 0b01000110
         CALL  = 0b01010000
         RET   = 0b00010001
+        CMP   = 0b10100111
+        JMP   = 0b01010100
+        JEQ   = 0b01010101
+        JNE   = 0b01010110
 
         # Add Opcodes to a branchtable
         self.branchtable = {}
@@ -36,6 +40,10 @@ class CPU:
         self.branchtable[LDI]   = self.ldi
         self.branchtable[CALL]  = self.call
         self.branchtable[RET]   = self.ret
+        self.branchtable[CMP]   = self.cmp
+        self.branchtable[JMP]   = self.jmp
+        self.branchtable[JEQ]   = self.jeq
+        self.branchtable[JNE]   = self.jne 
 
         # Program Counter
         self.PC = 0
@@ -43,6 +51,8 @@ class CPU:
         self.IR = 0
         # Stack Pointer
         self.SP = len(self.ram) - 1
+        # Flag
+        self.FL = 0b00000000
 
     def load(self, program = None):
         """Load a program into Memory/Ram"""
@@ -112,6 +122,10 @@ class CPU:
         # References alu to complete operation
         self.alu("ADD", reg_a, reg_b)
         # Increment Program Counter
+        self.PC += 3
+
+    def sub(self, reg_a, reg_b):
+        self.alu("SUB", reg_a, reg_b)
         self.PC += 3
 
     def subtract(self, reg_a, reg_b):
@@ -215,16 +229,42 @@ class CPU:
         self.PC = self.reg[reg_a]
 
     def ret(self, reg_a, reg_b):
-        
+        """
+        Returns to previous place in memory address
+        """    
         # Load old PC value from stack
         PC_val = self.pop(5)
         # Set current PC to old PC value
         self.PC = PC_val
 
+    def cmp(self, reg_a, reg_b):
+        if self.reg[reg_a] > self.reg[reg_b]:
+            self.FL = 0b00000010
+        elif self.reg[reg_a] < self.reg[reg_b]:
+            self.FL = 0b00000100
+        elif self.reg[reg_a] == self.reg[reg_b]:
+            self.FL = 0b00000001
+        
+        self.PC += 3
+            
+    def jmp(self, reg_a, reg_b = None):
+        self.PC = self.reg[reg_a]
+
+    def jeq(self, reg_a, reg_b):
+        if self.FL == 0b00000001:
+            self.jmp(reg_a)
+        else:
+            self.PC += 2
+            
+    def jne(self, reg_a, reg_b):
+        if self.FL == 0b00000010 or self.FL == 0b00000100:
+            self.jmp(reg_a)
+            
+        else:
+            self.PC += 2
+
     def run(self):
 
         while self.PC <= len(self.ram):
             IR = self.ram[self.PC]
-            # print("IR:",bin(IR))
             self.branchtable[IR](self.ram[self.PC + 1], self.ram[self.PC + 2])
-
